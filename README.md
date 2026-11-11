@@ -25,3 +25,17 @@ node scripts/build-worker.js site dist/_worker.js
 ```
 
 Then upload `dist/_worker.js` as a Pages direct-upload deployment (multipart form: `branch=main`, `manifest={}`, `_worker.js=@dist/_worker.js`).
+
+## Offline copies
+
+`offline/` holds a self-contained copy of each version that needs no internet:
+
+- `Instructional-Supervision-System-Version-1.html` / `-Version-2.html` — the full presentation (images and fonts embedded, speaker notes with **N**, full screen with **F**). Open by double-clicking.
+- `Instructional-Supervision-System-Version-1.pdf` / `-Version-2.pdf` — one slide per 16:9 page, as a fallback for any computer.
+
+Rebuild the HTML copies after changing a deck:
+
+```bash
+python3 scripts/build-offline.py site/v1/index.html offline/Instructional-Supervision-System-Version-1.html
+python3 scripts/build-offline.py site/v2/index.html offline/Instructional-Supervision-System-Version-2.html
+```
