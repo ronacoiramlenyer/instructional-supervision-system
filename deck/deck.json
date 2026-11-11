@@ -1,0 +1,22 @@
+{
+  "v": 4,
+  "createdOnFiles": {"v": 1, "at": "2026-11-11T09:00:00Z"},
+  "lists": "css",
+  "title": "Instructional Supervision System",
+  "cover": "prompt",
+  "order": ["prompt", "reality", "title", "stakes", "questions", "alignment", "ipo", "cycles", "cm-dash", "cot-dash", "merit", "survey", "voices", "reprompt", "limits", "thanks"],
+  "sections": {
+    "s1": {"description": "The hook: an AI-style prompt that is really a coordinator’s job description", "start": "prompt"},
+    "s2": {"description": "Why supervision needed a system, and the questions the study asked", "start": "title"},
+    "s3": {"description": "The design: framework, architecture and six DBR cycles", "start": "alignment"},
+    "s4": {"description": "What the system produces: dashboards, reports and merit rating", "start": "cm-dash"},
+    "s5": {"description": "Results from coordinators and what they said", "start": "survey"},
+    "s6": {"description": "Closing the loop on the prompt, limits, next steps", "start": "reprompt"}
+  },
+  "faces": {
+    "source-serif-4": {"family": "Source Serif 4", "href": "https://fonts.googleapis.com/css2?family=Source+Serif+4:wght@400;600;700&family=IBM+Plex+Sans:wght@400;600&family=JetBrains+Mono:wght@400;600&display=swap"},
+    "ibm-plex-sans": {"family": "IBM Plex Sans", "href": "https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;600&display=swap"},
+    "jetbrains-mono": {"family": "JetBrains Mono", "href": "https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&display=swap"}
+  },
+  "designSystems": []
+}

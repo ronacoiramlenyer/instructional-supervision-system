@@ -1,0 +1,564 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Instructional Supervision System</title>
+<meta name="description" content="Instructional Supervision System: a data-driven automated system for monitoring and evaluation of teachers’ performance. Research presentation, La Salle Green Hills.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Serif+4:wght@400;600;700&family=IBM+Plex+Sans:wght@400;600&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; }
+  html, body { height: 100%; background: #0B2A1F; overflow: hidden; }
+  body { font-family: 'IBM Plex Sans', Arial, sans-serif; }
+  #viewport { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; }
+  #stage { position: relative; width: 1920px; height: 1080px; flex: none; transform-origin: center center; }
+  #stage > section { position: absolute; inset: 0; width: 1920px; height: 1080px; overflow: hidden;
+    opacity: 0; visibility: hidden; transition: opacity .35s ease, visibility .35s; }
+  #stage > section.active { opacity: 1; visibility: visible; }
+  section div { display: flex; flex-direction: column; min-width: 0; }
+  section h1, section h2, section h3, section p { overflow-wrap: break-word; }
+  section h1 { font-size: 96px; } section h2 { font-size: 64px; } section h3 { font-size: 44px; }
+  section ul { padding-left: 1.1em; }
+  section li::marker { color: currentColor; }
+  section img { display: block; }
+  section aside { display: none; }
+  #bar { position: fixed; left: 0; right: 0; bottom: 0; display: flex; align-items: center; justify-content: center; gap: 12px;
+    padding: 10px; font: 14px 'IBM Plex Sans', Arial, sans-serif; color: #C9D9CF; opacity: 0; transition: opacity .3s; }
+  body:hover #bar, #bar:focus-within { opacity: 1; }
+  #bar button { background: rgba(245,243,236,.12); color: #F5F3EC; border: 1px solid rgba(245,243,236,.25); border-radius: 8px;
+    padding: 6px 14px; font: inherit; cursor: pointer; }
+  #bar button:hover { background: rgba(245,243,236,.22); }
+  #notes { position: fixed; right: 16px; top: 16px; width: min(420px, calc(100vw - 32px)); max-height: 60vh; overflow: auto;
+    background: rgba(14,51,38,.95); color: #F5F3EC; border: 1px solid #2E5A47; border-radius: 12px; padding: 16px 18px;
+    font: 15px/1.5 'IBM Plex Sans', Arial, sans-serif; white-space: pre-wrap; display: none; }
+  #notes.show { display: block; }
+  #progress { position: fixed; left: 0; top: 0; height: 4px; background: #E3B23C; transition: width .3s; }
+</style>
+</head>
+<body>
+<div id="progress"></div>
+<div id="viewport"><div id="stage">
+<section id="prompt" data-transition="fade" style="background:#F5F3EC;color:#1B2620;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;justify-content:center;gap:32px">
+<p style="font-size:32px;color:#5B6660;font-family:'JetBrains Mono', 'Courier New', monospace">New chat</p>
+<div style="display:flex;flex-direction:column;gap:32px;background:#FDFCF8;border:2px solid #D9D6CC;border-radius:32px;padding:56px 64px;box-shadow:0px 12px 48px rgba(14,51,38,0.10)">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:48px;line-height:1.45;color:#1B2620"><b>Act as a subject coordinator.</b> Review every teacher’s curriculum map, learning guide and classroom observation for three trimesters. Then rate each one fairly for merit, tell each exactly what to improve, and find your department’s training needs. <span style="color:#1F7A4A">Show your evidence.</span></p>
+<div style="display:flex;flex-direction:row;justify-content:space-between;align-items:center">
+<p style="font-size:28px;color:#5B6660">Press Enter to send</p>
+<div style="display:flex;align-items:center;justify-content:center;width:88px;height:88px;background:#0E3326;border-radius:44px">
+<svg class="icon" style="color:#F5F3EC;width:44px;height:44px;flex:none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 2 11 13"/><path d="M22 2 15 22l-4-9-9-4 20-7z"/></svg>
+</div>
+</div>
+</div>
+<p style="position:absolute;left:128px;bottom:64px;width:1664px;font-size:28px;color:#5B6660">Instructional Supervision System · Reynel Mario Canor · La Salle Green Hills · ReCap 4.1</p>
+<aside>(~45 sec) Open with the prompt on screen. Read it aloud slowly, the way you would type it into ChatGPT or Claude.
+
+“Most of us have typed something like this. ‘Act as a…’ — act as a tutor, act as an editor. So let’s try one: act as a subject coordinator.”
+
+Pause. “Review every curriculum map, every learning guide, every classroom observation, for three trimesters. Rate each teacher fairly for merit. Tell each exactly what to improve. Find the department’s training needs. And — show your evidence.”
+
+“That last line is the hard part. Hit Enter. What comes back?”</aside>
+</section>
+
+<section id="reality" data-transition="fade" style="background:#F5F3EC;color:#1B2620;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px;display:flex;flex-direction:column;gap:48px">
+<p style="font-size:32px;color:#1F7A4A;font-weight:600;text-transform:uppercase;letter-spacing:3px">Without a system, the reply looks like this</p>
+<h2 style="font-family:'Source Serif 4', Georgia, serif;font-size:88px;font-weight:600;line-height:1.05;color:#0E3326">Manual records. Isolated tools. Feedback that can’t diagnose.</h2>
+<div style="flex:1;display:grid;grid-template-columns:1fr 1fr 1fr;gap:32px">
+<div style="display:flex;flex-direction:column;gap:16px;background:#FDFCF8;border:1px solid #D9D6CC;border-radius:24px;padding:40px">
+<svg class="icon" style="color:#1F7A4A;width:56px;height:56px;flex:none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+<h3 style="font-size:44px;font-weight:600;color:#0E3326">Fragmented data</h3>
+<p style="font-size:36px;line-height:1.35;color:#3F4A44">CM, LG and observation checks recorded by hand, each in its own format.</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:16px;background:#FDFCF8;border:1px solid #D9D6CC;border-radius:24px;padding:40px">
+<svg class="icon" style="color:#1F7A4A;width:56px;height:56px;flex:none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+<h3 style="font-size:44px;font-weight:600;color:#0E3326">Hidden trends</h3>
+<p style="font-size:36px;line-height:1.35;color:#3F4A44">Tracking growth meant re-reading records. Training needs stayed invisible.</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:16px;background:#FDFCF8;border:1px solid #D9D6CC;border-radius:24px;padding:40px">
+<svg class="icon" style="color:#1F7A4A;width:56px;height:56px;flex:none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>
+<h3 style="font-size:44px;font-weight:600;color:#0E3326">Weak merit basis</h3>
+<p style="font-size:36px;line-height:1.35;color:#3F4A44">Compiling evidence was slow; feedback rarely said what to fix.</p>
+</div>
+</div>
+<aside>(~50 sec) “Without a system, this is the honest reply.” This is RQ1 — the challenges in our current process at LSGH.
+
+Walk the three cards:
+1. Fragmented data — coordinators do monitor CMs, LGs and observations, but recording is manual and every supervisor devises their own approach and format.
+2. Hidden trends — to see how a teacher performs over time, you have to thematically re-read records. Training needs are hard to pinpoint.
+3. Weak merit basis — compiling for merit rating is slow, and feedback to teachers is generally not diagnostic.
+
+Transition: “So the question became: can we build the coordinator a system that actually answers that prompt — with evidence?”</aside>
+</section>
+
+<section id="title" data-transition="fade" style="background:#0E3326;color:#F5F3EC;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px;display:flex;flex-direction:column;justify-content:center;gap:48px">
+<p style="font-size:32px;color:#E3B23C;font-weight:600;text-transform:uppercase;letter-spacing:3px">Research study · ReCap 4.1</p>
+<h1 style="font-family:'Source Serif 4', Georgia, serif;font-size:144px;font-weight:700;line-height:1.02;color:#F5F3EC">Instructional Supervision System</h1>
+<p style="font-size:52px;line-height:1.25;color:#C9D9CF">A data-driven automated system for monitoring and evaluation of teachers’ performance</p>
+<div style="width:200px;height:8px;background:#E3B23C"></div>
+<p style="font-size:40px;line-height:1.35;color:#F5F3EC"><b>Reynel Mario Canor</b><br><span style="color:#C9D9CF">La Salle Green Hills · May 2026</span></p>
+<aside>(~20 sec) “This is my study — the Instructional Supervision System: a data-driven, automated system for monitoring and evaluating teachers’ performance.”
+
+Keep it short. One breath. The prompt already did the introduction.</aside>
+</section>
+
+<section id="stakes" data-transition="fade" style="background:#F5F3EC;color:#1B2620;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:48px">
+<p style="font-size:32px;color:#1F7A4A;font-weight:600;text-transform:uppercase;letter-spacing:3px">Why it matters</p>
+<h2 style="font-family:'Source Serif 4', Georgia, serif;font-size:88px;font-weight:600;line-height:1.05;color:#0E3326">Evaluation shapes a teacher’s growth — and pay</h2>
+<div style="flex:1;display:flex;flex-direction:row;gap:64px;align-items:stretch">
+<div style="flex:1;display:flex;flex-direction:column;gap:16px;border-top:8px solid #1F7A4A;padding:32px 0px 0px 0px">
+<p style="font-family:'Source Serif 4', Georgia, serif;font-size:160px;font-weight:700;line-height:1;color:#0E3326">RA 10912</p>
+<p style="font-size:40px;line-height:1.35;color:#3F4A44">The CPD Act requires teachers to keep upgrading — which needs <b>objective</b> evidence of the gaps.</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:16px;border-top:8px solid #1F7A4A;padding:32px 0px 0px 0px">
+<p style="font-family:'Source Serif 4', Georgia, serif;font-size:160px;font-weight:700;line-height:1;color:#0E3326">11 of 19</p>
+<p style="font-size:40px;line-height:1.35;color:#3F4A44">countries in an OECD appraisal study link evaluation results to <b>salary</b>.</p>
+</div>
+</div>
+<p style="position:absolute;left:128px;bottom:64px;width:1664px;font-size:28px;color:#5B6660">Sources: Republic Act 10912 (2016); OECD (n.d.); Darling-Hammond et al. (2017)</p>
+<aside>(~40 sec) Two reasons this matters beyond our school.
+
+First, RA 10912 — the CPD Act of 2016 — requires every professional, teachers included, to keep updating and upgrading. You can only choose the right training if you know your gaps objectively.
+
+Second, evaluation has stakes. In an OECD study on teacher appraisal, 11 of 19 countries tie evaluation results to salary. Here at LSGH, merit rating feeds ranking and promotion.
+
+Darling-Hammond reminds us good PD is sustained and informed by feedback and reflection. So if evaluation affects growth and pay, it has to be structured, consistent and transparent.</aside>
+</section>
+
+<section id="questions" data-transition="fade" style="background:#F5F3EC;color:#1B2620;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px;display:flex;flex-direction:column;gap:48px">
+<p style="font-size:32px;color:#1F7A4A;font-weight:600;text-transform:uppercase;letter-spacing:3px">Research questions</p>
+<h2 style="font-family:'Source Serif 4', Georgia, serif;font-size:88px;font-weight:600;line-height:1.05;color:#0E3326">Four questions guided the study</h2>
+<div style="flex:1;display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;gap:32px">
+<div style="display:flex;flex-direction:row;gap:32px;align-items:center;background:#FDFCF8;border:1px solid #D9D6CC;border-radius:24px;padding:40px">
+<p style="font-family:'Source Serif 4', Georgia, serif;font-size:96px;font-weight:700;line-height:1;color:#1F7A4A">1</p>
+<p style="font-size:40px;line-height:1.3;color:#3F4A44"><b style="color:#0E3326">Challenges:</b> what hinders recording, monitoring and sharing teacher data?</p>
+</div>
+<div style="display:flex;flex-direction:row;gap:32px;align-items:center;background:#FDFCF8;border:1px solid #D9D6CC;border-radius:24px;padding:40px">
+<p style="font-family:'Source Serif 4', Georgia, serif;font-size:96px;font-weight:700;line-height:1;color:#1F7A4A">2</p>
+<p style="font-size:40px;line-height:1.3;color:#3F4A44"><b style="color:#0E3326">Design:</b> how can a digital system evaluate CMs, LGs and observations?</p>
+</div>
+<div style="display:flex;flex-direction:row;gap:32px;align-items:center;background:#FDFCF8;border:1px solid #D9D6CC;border-radius:24px;padding:40px">
+<p style="font-family:'Source Serif 4', Georgia, serif;font-size:96px;font-weight:700;line-height:1;color:#1F7A4A">3</p>
+<p style="font-size:40px;line-height:1.3;color:#3F4A44"><b style="color:#0E3326">Output:</b> how does it present data for merit and training needs?</p>
+</div>
+<div style="display:flex;flex-direction:row;gap:32px;align-items:center;background:#FDFCF8;border:1px solid #D9D6CC;border-radius:24px;padding:40px">
+<p style="font-family:'Source Serif 4', Georgia, serif;font-size:96px;font-weight:700;line-height:1;color:#1F7A4A">4</p>
+<p style="font-size:40px;line-height:1.3;color:#3F4A44"><b style="color:#0E3326">Impact:</b> how does it improve coordinators’ supervision practice?</p>
+</div>
+</div>
+<aside>(~35 sec) Four research questions — don’t read them word for word, use the bold labels.
+
+1. Challenges — what we just saw.
+2. Design — how to build a system for structured, data-driven evaluation of curriculum maps, learning guides and classroom observations.
+3. Output — how it produces and displays data for merit rating and training needs assessment.
+4. Impact — how it helps subject coordinators in monitoring, data access, decision-making, and merit rating.
+
+“I’ll answer them in order: design first, then output, then impact.”</aside>
+</section>
+
+<section id="alignment" data-transition="fade" style="background:#F5F3EC;color:#1B2620;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:48px">
+<p style="font-size:32px;color:#1F7A4A;font-weight:600;text-transform:uppercase;letter-spacing:3px">Framework · Constructive Alignment (Biggs, 1999)</p>
+<h2 style="font-family:'Source Serif 4', Georgia, serif;font-size:88px;font-weight:600;line-height:1.05;color:#0E3326">Evaluate the whole teaching chain</h2>
+<div style="flex:1;display:flex;flex-direction:row;align-items:stretch;gap:24px">
+<div style="flex:1;display:flex;flex-direction:column;gap:12px;background:#FDFCF8;border:1px solid #D9D6CC;border-top:8px solid #1F7A4A;border-radius:16px;padding:36px">
+<p style="font-size:28px;color:#1F7A4A;font-weight:600;text-transform:uppercase;letter-spacing:2px">Plan</p>
+<h3 style="font-size:48px;font-weight:600;color:#0E3326">CM Analytics</h3>
+<p style="font-size:32px;line-height:1.35;color:#3F4A44">Curriculum Map: are intended outcomes aligned?</p>
+<div style="flex:1"></div>
+<p style="font-family:'Source Serif 4', Georgia, serif;font-size:120px;font-weight:700;line-height:1;color:#0E3326">28</p><p style="font-size:28px;color:#5B6660;text-transform:uppercase;letter-spacing:2px">indicators</p>
+</div>
+<div style="display:flex;align-items:center"><svg width="64" height="32" viewBox="0 0 10 5" preserveAspectRatio="none" aria-hidden="true"><path d="M0 1.5h6V0l4 2.5L6 5V3.5H0z" fill="#1F7A4A"/></svg></div>
+<div style="flex:1;display:flex;flex-direction:column;gap:12px;background:#FDFCF8;border:1px solid #D9D6CC;border-top:8px solid #1F7A4A;border-radius:16px;padding:36px">
+<p style="font-size:28px;color:#1F7A4A;font-weight:600;text-transform:uppercase;letter-spacing:2px">Design</p>
+<h3 style="font-size:48px;font-weight:600;color:#0E3326">LG Analytics</h3>
+<p style="font-size:32px;line-height:1.35;color:#3F4A44">Learning Guide: instructional designs ID1–ID9</p>
+<div style="flex:1"></div>
+<p style="font-family:'Source Serif 4', Georgia, serif;font-size:120px;font-weight:700;line-height:1;color:#0E3326">34</p><p style="font-size:28px;color:#5B6660;text-transform:uppercase;letter-spacing:2px">indicators</p>
+</div>
+<div style="display:flex;align-items:center"><svg width="64" height="32" viewBox="0 0 10 5" preserveAspectRatio="none" aria-hidden="true"><path d="M0 1.5h6V0l4 2.5L6 5V3.5H0z" fill="#1F7A4A"/></svg></div>
+<div style="flex:1;display:flex;flex-direction:column;gap:12px;background:#FDFCF8;border:1px solid #D9D6CC;border-top:8px solid #1F7A4A;border-radius:16px;padding:36px">
+<p style="font-size:28px;color:#1F7A4A;font-weight:600;text-transform:uppercase;letter-spacing:2px">Implement</p>
+<h3 style="font-size:48px;font-weight:600;color:#0E3326">COT Analytics</h3>
+<p style="font-size:32px;line-height:1.35;color:#3F4A44">Classroom Observation: teacher and student look-fors</p>
+<div style="flex:1"></div>
+<p style="font-family:'Source Serif 4', Georgia, serif;font-size:120px;font-weight:700;line-height:1;color:#0E3326">20</p><p style="font-size:28px;color:#5B6660;text-transform:uppercase;letter-spacing:2px">indicators</p>
+</div>
+</div>
+<p style="position:absolute;left:128px;bottom:64px;width:1664px;font-size:28px;color:#5B6660">Indicators anchored on the LSGH Curriculum Framework and approved by school authorities</p>
+<aside>(~60 sec) RQ2 — the design. The theory is Biggs’ Constructive Alignment: learning works when outcomes, teaching activities and assessment line up.
+
+So instead of judging a teacher on one observation, the system follows the whole chain:
+- PLAN — CM Analytics, 28 indicators across Real-World Inquiry, Concept-building, Integration and Transfer, and Self-evaluation.
+- DESIGN — LG Analytics, 34 indicators across the nine instructional designs, ID1 to ID9.
+- IMPLEMENT — COT Analytics, 20 look-fors: 13 on the teacher, 7 on the students.
+
+That’s 82 indicators in total, all drawn from the LSGH Curriculum Framework and approved by the school before use. Planning, design and implementation — assessed together, not in isolation.</aside>
+</section>
+
+<section id="ipo" data-transition="fade" style="background:#F5F3EC;color:#1B2620;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px;display:flex;flex-direction:row;gap:64px;align-items:stretch">
+<div style="flex:1;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:32px;color:#1F7A4A;font-weight:600;text-transform:uppercase;letter-spacing:3px">How it works · Sheets + Apps Script</p>
+<h2 style="font-family:'Source Serif 4', Georgia, serif;font-size:88px;font-weight:600;line-height:1.05;color:#0E3326">One click turns a checklist into a report</h2>
+<div style="flex:1;display:flex;flex-direction:column;justify-content:space-between">
+<div style="display:flex;flex-direction:row;gap:28px;align-items:center;border-top:2px solid #D9D6CC;padding:24px 0px">
+<p style="font-size:28px;font-weight:600;color:#1F7A4A;width:200px;text-transform:uppercase;letter-spacing:2px">Input</p>
+<p style="font-size:36px;line-height:1.3;color:#3F4A44;flex:1">Tick <b>Accomplished</b> or <b>Needs Improvement</b> per indicator in a sidebar</p>
+</div>
+<div style="display:flex;flex-direction:row;gap:28px;align-items:center;border-top:2px solid #D9D6CC;padding:24px 0px">
+<p style="font-size:28px;font-weight:600;color:#1F7A4A;width:200px;text-transform:uppercase;letter-spacing:2px">Process</p>
+<p style="font-size:36px;line-height:1.3;color:#3F4A44;flex:1">Scores convert to a <b>4-point scale</b> and save to a central database</p>
+</div>
+<div style="display:flex;flex-direction:row;gap:28px;align-items:center;border-top:2px solid #D9D6CC;border-bottom:2px solid #D9D6CC;padding:24px 0px">
+<p style="font-size:28px;font-weight:600;color:#1F7A4A;width:200px;text-transform:uppercase;letter-spacing:2px">Output</p>
+<p style="font-size:36px;line-height:1.3;color:#3F4A44;flex:1"><b>PDF report</b> emailed to the teacher; the <b>dashboard</b> updates</p>
+</div>
+</div>
+</div>
+<img src="images/cm-encoder-sidebar.png" alt="CM Analytics Encoder 3.0 sidebar with teacher details and Accomplished / Needs Improvement options for each indicator" style="width:420px;height:824px;object-fit:contain;background:#FDFCF8;border:1px solid #D9D6CC;border-radius:24px">
+<aside>(~55 sec) Architecture. Built on what the school already has — Google Sheets as the database, Google Apps Script for the automation. No extra software, no extra cost.
+
+It’s an Input–Process–Output flow:
+- INPUT: the coordinator opens a custom menu — “CM Analytics Encoder 3.0” — and a sidebar appears (point to screenshot). Teacher, trimester, school year, then each indicator: Accomplished or Needs Improvement.
+- PROCESS: on submit, the raw marks become a 4-point score and are stored in the database.
+- OUTPUT: a PDF performance report goes straight to the teacher’s inbox through Gmail, and the dashboard updates for the coordinator.
+
+For COT, the coordinator can “Send to Me” first to verify, then “Send to Teacher”, or save as draft.</aside>
+</section>
+
+<section id="cycles" data-transition="fade" style="background:#0E3326;color:#F5F3EC;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:32px;color:#E3B23C;font-weight:600;text-transform:uppercase;letter-spacing:3px">Method · Design-Based Research</p>
+<h2 style="font-family:'Source Serif 4', Georgia, serif;font-size:88px;font-weight:600;line-height:1.05;color:#F5F3EC">Six cycles of use and refinement</h2>
+<div style="flex:1;display:grid;grid-template-columns:1fr 1fr 1fr;grid-template-rows:1fr 1fr;gap:32px 40px">
+<div style="display:flex;flex-direction:column;gap:8px;border-top:6px solid #E3B23C;padding:20px 0px 0px 0px">
+<p style="font-size:28px;color:#E3B23C;font-weight:600">CYCLE 1</p>
+<h3 style="font-size:40px;font-weight:600;color:#F5F3EC">Indicator checklist</h3>
+<p style="font-size:32px;line-height:1.35;color:#C9D9CF">Auto-feedback on unmet indicators; raw counts only</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:8px;border-top:6px solid #E3B23C;padding:20px 0px 0px 0px">
+<p style="font-size:28px;color:#E3B23C;font-weight:600">CYCLE 2</p>
+<h3 style="font-size:40px;font-weight:600;color:#F5F3EC">Scores and radars</h3>
+<p style="font-size:32px;line-height:1.35;color:#C9D9CF">Normalized scale; weights so critical indicators count</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:8px;border-top:6px solid #E3B23C;padding:20px 0px 0px 0px">
+<p style="font-size:28px;color:#E3B23C;font-weight:600">CYCLE 3</p>
+<h3 style="font-size:40px;font-weight:600;color:#F5F3EC">Analytics, extended</h3>
+<p style="font-size:32px;line-height:1.35;color:#C9D9CF">Indicator-level percentages; CM model applied to LG, COT</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:8px;border-top:6px solid #E3B23C;padding:20px 0px 0px 0px">
+<p style="font-size:28px;color:#E3B23C;font-weight:600">CYCLE 4</p>
+<h3 style="font-size:40px;font-weight:600;color:#F5F3EC">Data integrity</h3>
+<p style="font-size:32px;line-height:1.35;color:#C9D9CF">Per-indicator storage and validation checks</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:8px;border-top:6px solid #E3B23C;padding:20px 0px 0px 0px">
+<p style="font-size:28px;color:#E3B23C;font-weight:600">CYCLE 5</p>
+<h3 style="font-size:40px;font-weight:600;color:#F5F3EC">Shared scoring</h3>
+<p style="font-size:32px;line-height:1.35;color:#C9D9CF">One score set for co-written maps and guides</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:8px;border-top:6px solid #E3B23C;padding:20px 0px 0px 0px">
+<p style="font-size:28px;color:#E3B23C;font-weight:600">CYCLE 6</p>
+<h3 style="font-size:40px;font-weight:600;color:#F5F3EC">Decision support</h3>
+<p style="font-size:32px;line-height:1.35;color:#C9D9CF">Auto-emailed reports; department dashboards</p>
+</div>
+</div>
+<p style="position:absolute;left:128px;bottom:64px;width:1664px;font-size:28px;color:#C9D9CF">Version 3.0, after three years of use, now feeds the school’s merit rating</p>
+<aside>(~75 sec) Method: Design-Based Research — design, use it in the real setting, evaluate, refine. Feedback came from academic team meetings, department discussions and post-conferences with teachers.
+
+Each cycle fixed a problem the previous one exposed:
+1. A checklist with automatic feedback — but raw counts couldn’t be compared.
+2. A standardized score and radar charts. We learned equal weights let teachers score high while missing critical indicators, so we added grouped weighting.
+3. Indicator-level percentages, and the model was extended from CM to LG to COT.
+4. Database rebuilt to store every indicator, with validation, so longitudinal reports are possible.
+5. Shared scoring — teachers often co-write one CM; before, encoding a second teacher erased the first.
+6. Automatic emailing and department dashboards — from a reporting tool to a decision-support tool.
+
+By year 3, version 3.0 was integrated into merit rating.</aside>
+</section>
+
+<section id="cm-dash" data-transition="fade" style="background:#F5F3EC;color:#1B2620;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px;display:flex;flex-direction:row;gap:64px;align-items:stretch">
+<div style="width:700px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:32px;color:#1F7A4A;font-weight:600;text-transform:uppercase;letter-spacing:3px">Output · CM and LG dashboards</p>
+<h2 style="font-family:'Source Serif 4', Georgia, serif;font-size:88px;font-weight:600;line-height:1.05;color:#0E3326">The dips are the training needs</h2>
+<p style="font-size:36px;line-height:1.35;color:#3F4A44">Radar charts show every indicator at once, per subject and for the whole school.</p>
+<p style="font-size:36px;line-height:1.35;color:#3F4A44">A <b style="color:#0E3326">dip</b> shows where coaching should go — like <b style="color:#0E3326">ID5</b>, higher-order thinking.</p>
+</div>
+<img src="images/cm-dashboard.png" alt="CM Writing Performance Report dashboard: a large institutional radar chart and smaller radar charts per subject area" style="flex:1;height:824px;object-fit:contain;background:#0E3326;border-radius:24px">
+<aside>(~50 sec) RQ3 — how the system displays the data.
+
+Point to the screen: this is the actual CM Writing Performance dashboard, third trimester, SY 2025–2026. The large radar is the whole institution; the small ones are per subject area.
+
+How to read it: the fuller the radar, the stronger the performance. Every dip is an indicator where teachers are falling short — that’s a training need, made visible.
+
+Example from the LG dashboard: dips clustered on ID5 — deep processing and higher-order thinking. That tells us exactly where to focus professional development, while the strong areas become benchmarks.</aside>
+</section>
+
+<section id="cot-dash" data-transition="fade" style="background:#F5F3EC;color:#1B2620;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px;display:flex;flex-direction:row;gap:64px;align-items:stretch">
+<img src="images/cot-dashboard.png" alt="Classroom Observation dashboard with mean-score gauges for PS–Grade 10 and SHS, a completion tracker, and indicator bar charts" style="width:824px;height:824px;object-fit:contain;background:#0E3326;border-radius:24px">
+<div style="flex:1;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:32px;color:#1F7A4A;font-weight:600;text-transform:uppercase;letter-spacing:3px">Output · COT dashboard</p>
+<h2 style="font-family:'Source Serif 4', Georgia, serif;font-size:88px;font-weight:600;line-height:1.05;color:#0E3326">Every department at a glance</h2>
+<div style="display:flex;flex-direction:column;gap:8px">
+<p style="font-family:'Source Serif 4', Georgia, serif;font-size:160px;font-weight:700;line-height:1;color:#1F7A4A">99.55%</p>
+<p style="font-size:36px;line-height:1.35;color:#3F4A44">of teachers observed, tracked live</p>
+</div>
+<p style="font-size:36px;line-height:1.35;color:#3F4A44">Gauges compare unit and department means; bars show each look-for.</p>
+</div>
+<aside>(~40 sec) The Classroom Observation dashboard works a little differently because observation happens in real time.
+
+Gauges show the mean score — PS to Grade 10 on the left, SHS on the right, and a selected department in the middle. The bars below show each teacher and student look-for.
+
+And my favorite feature for coordinators: the completion tracker. In this snapshot, 99.55% of teachers had been observed — you can see at a glance who is still pending.
+
+Teachers, meanwhile, receive a structured PDF report with scores and remarks, right after the post-conference.</aside>
+</section>
+
+<section id="merit" data-transition="fade" style="background:#F5F3EC;color:#1B2620;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:32px;color:#1F7A4A;font-weight:600;text-transform:uppercase;letter-spacing:3px">Output · Merit rating</p>
+<h2 style="font-family:'Source Serif 4', Georgia, serif;font-size:88px;font-weight:600;line-height:1.05;color:#0E3326">Evidence becomes one merit score</h2>
+<div style="display:flex;flex-direction:row;gap:32px">
+<div style="flex:1;display:flex;flex-direction:row;gap:28px;align-items:center;background:#FDFCF8;border:1px solid #D9D6CC;border-radius:20px;padding:28px 32px">
+<p style="font-family:'Source Serif 4', Georgia, serif;font-size:96px;font-weight:700;line-height:1;color:#1F7A4A">5%</p>
+<p style="font-size:32px;line-height:1.3;color:#3F4A44"><b style="color:#0E3326">CM</b> · Domain 1<br>Curriculum Planning</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:row;gap:28px;align-items:center;background:#FDFCF8;border:1px solid #D9D6CC;border-radius:20px;padding:28px 32px">
+<p style="font-family:'Source Serif 4', Georgia, serif;font-size:96px;font-weight:700;line-height:1;color:#1F7A4A">5%</p>
+<p style="font-size:32px;line-height:1.3;color:#3F4A44"><b style="color:#0E3326">LG</b> · Domain 2<br>Content, Pedagogy</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:row;gap:28px;align-items:center;background:#FDFCF8;border:1px solid #D9D6CC;border-radius:20px;padding:28px 32px">
+<p style="font-family:'Source Serif 4', Georgia, serif;font-size:96px;font-weight:700;line-height:1;color:#1F7A4A">15%</p>
+<p style="font-size:32px;line-height:1.3;color:#3F4A44"><b style="color:#0E3326">COT</b> · Domain 3<br>Instruction</p>
+</div>
+</div>
+<img src="images/merit-matrix.png" alt="Merit rating matrix: Domains 1 to 3 rated from the averages of three trimester CM, LG and COT scores, with weight contributions of 5, 5 and 15 percent" style="width:1664px;height:370px;object-fit:contain;background:#FDFCF8;border:1px solid #D9D6CC;border-radius:16px">
+<p style="position:absolute;left:128px;bottom:64px;width:1664px;font-size:28px;color:#5B6660">3-trimester average: 3.51–4.00 Exceeds · 3.00–3.50 Meets · 2.00–2.99 Partially · below 2 Does not meet</p>
+<aside>(~50 sec) This is where RQ3 pays off — merit rating.
+
+Each subsystem maps to a domain of the school’s merit rating form:
+- CM → Domain 1, Curriculum Planning and Development — 5%
+- LG → Domain 2, Content Knowledge and Pedagogy — 5%
+- COT → Domain 3, Instruction — 15%
+
+The system averages the teacher’s scores across the three trimesters, and that average lands in a band: 3.51 to 4.00 is “Exceeds expectations,” and so on.
+
+So a full quarter of the Professional Commitment component now rests on documented, indicator-level evidence — not on impressions. That’s the “show your evidence” line from the prompt.</aside>
+</section>
+
+<section id="survey" data-transition="fade" style="background:#F5F3EC;color:#1B2620;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:48px">
+<p style="font-size:32px;color:#1F7A4A;font-weight:600;text-transform:uppercase;letter-spacing:3px">Results · Coordinator survey (N = 10, 5-point scale)</p>
+<h2 style="font-family:'Source Serif 4', Georgia, serif;font-size:88px;font-weight:600;line-height:1.05;color:#0E3326">Every construct rated above 4.8</h2>
+<div style="flex:1;display:flex;flex-direction:row;gap:64px;align-items:stretch">
+<div style="flex:1;display:flex;flex-direction:column;justify-content:space-between">
+<div style="display:flex;flex-direction:column;gap:8px">
+<div style="display:flex;flex-direction:row;justify-content:space-between"><p style="font-size:34px;color:#1B2620">Evidence for merit rating</p><p style="font-size:34px;font-weight:600;color:#0E3326">4.89</p></div>
+<div style="height:24px;background:#E4E1D7;border-radius:12px;display:flex;flex-direction:row"><div style="width:97.8%;background:#1F7A4A;border-radius:12px"></div></div>
+</div>
+<div style="display:flex;flex-direction:column;gap:8px">
+<div style="display:flex;flex-direction:row;justify-content:space-between"><p style="font-size:34px;color:#1B2620">Improvement and responsiveness</p><p style="font-size:34px;font-weight:600;color:#0E3326">4.89</p></div>
+<div style="height:24px;background:#E4E1D7;border-radius:12px;display:flex;flex-direction:row"><div style="width:97.8%;background:#1F7A4A;border-radius:12px"></div></div>
+</div>
+<div style="display:flex;flex-direction:column;gap:8px">
+<div style="display:flex;flex-direction:row;justify-content:space-between"><p style="font-size:34px;color:#1B2620">Data access and interpretability</p><p style="font-size:34px;font-weight:600;color:#0E3326">4.85</p></div>
+<div style="height:24px;background:#E4E1D7;border-radius:12px;display:flex;flex-direction:row"><div style="width:97%;background:#1F7A4A;border-radius:12px"></div></div>
+</div>
+<div style="display:flex;flex-direction:column;gap:8px">
+<div style="display:flex;flex-direction:row;justify-content:space-between"><p style="font-size:34px;color:#1B2620">Decision support for coaching and PD</p><p style="font-size:34px;font-weight:600;color:#0E3326">4.83</p></div>
+<div style="height:24px;background:#E4E1D7;border-radius:12px;display:flex;flex-direction:row"><div style="width:96.6%;background:#1F7A4A;border-radius:12px"></div></div>
+</div>
+<div style="display:flex;flex-direction:column;gap:8px">
+<div style="display:flex;flex-direction:row;justify-content:space-between"><p style="font-size:34px;color:#1B2620">Monitoring teacher performance</p><p style="font-size:34px;font-weight:600;color:#0E3326">4.81</p></div>
+<div style="height:24px;background:#E4E1D7;border-radius:12px;display:flex;flex-direction:row"><div style="width:96.2%;background:#1F7A4A;border-radius:12px"></div></div>
+</div>
+</div>
+<div style="width:480px;display:flex;flex-direction:column;justify-content:center;gap:16px;background:#0E3326;border-radius:24px;padding:48px">
+<p style="font-family:'Source Serif 4', Georgia, serif;font-size:160px;font-weight:700;line-height:1;color:#E3B23C">5.00</p>
+<p style="font-size:36px;line-height:1.3;color:#F5F3EC">median on all five constructs</p>
+<p style="font-size:28px;line-height:1.35;color:#C9D9CF">SD 0.28–0.35 · no rating below 4.00</p>
+</div>
+</div>
+<p style="position:absolute;left:128px;bottom:64px;width:1664px;font-size:28px;color:#5B6660">Bar length = mean out of 5. Survey is supporting evidence alongside the DBR findings.</p>
+<aside>(~50 sec) RQ4 — impact. Ten subject coordinators, the actual users, rated the system on a 5-point scale across five constructs.
+
+Every construct averaged above 4.8. Highest: evidence-based contribution to merit rating, and system improvement and responsiveness — both 4.89. That second one matters to me, because it says the DBR cycles were felt: coordinators saw their feedback turn into changes.
+
+Agreement was tight: median 5.00 everywhere, SD between 0.28 and 0.35, and no rating below 4.
+
+Be honest about it: N is 10, so the survey is supporting evidence. The main evidence is the documented design cycles and the system’s actual use.</aside>
+</section>
+
+<section id="voices" data-transition="fade" style="background:#0E3326;color:#F5F3EC;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px;display:flex;flex-direction:column;justify-content:space-between;gap:56px">
+<p style="font-size:32px;color:#E3B23C;font-weight:600;text-transform:uppercase;letter-spacing:3px">In coordinators’ words</p>
+<p style="font-family:'Source Serif 4', Georgia, serif;font-size:88px;font-weight:600;line-height:1.15;color:#F5F3EC">“…ang kalakasan at kailangan pang paunlarin ng mga guro at ng department.”</p>
+<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:48px">
+<div style="display:flex;flex-direction:column;border-left:6px solid #E3B23C;padding:0px 0px 0px 28px">
+<p style="font-size:36px;line-height:1.35;color:#F5F3EC">“…design more targeted and specific action plans.”</p>
+</div>
+<div style="display:flex;flex-direction:column;border-left:6px solid #E3B23C;padding:0px 0px 0px 28px">
+<p style="font-size:36px;line-height:1.35;color:#F5F3EC">“Averages of the three components (CM, LG, and COT)… were available.”</p>
+</div>
+<div style="display:flex;flex-direction:column;border-left:6px solid #E3B23C;padding:0px 0px 0px 28px">
+<p style="font-size:36px;line-height:1.35;color:#F5F3EC">“…to see specific areas that need improvement” — in vertical meetings.</p>
+</div>
+</div>
+<aside>(~40 sec) What coordinators wrote in the open-ended items.
+
+Read the big one in Filipino, then translate: “the strengths, and what still needs developing, of the teachers and of the department.” The system shows both — for each teacher and for the whole department.
+
+Then the three smaller quotes:
+- “Design more targeted and specific action plans to address these areas of concern” — training needs, answered.
+- The CM, LG and COT averages ready for performance appraisal — merit rating, answered.
+- Specific areas for improvement in CM and LG, used in vertical meetings — conversations are now about indicators, not impressions.
+
+Teachers also became more reflective, because they receive indicator-based feedback automatically.</aside>
+</section>
+
+<section id="reprompt" data-transition="fade" style="background:#F5F3EC;color:#1B2620;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px;display:flex;flex-direction:column;justify-content:space-between;gap:24px">
+<p style="font-size:32px;color:#1F7A4A;font-weight:600;text-transform:uppercase;letter-spacing:3px">Back to the prompt</p>
+<div style="display:flex;flex-direction:column;background:#FDFCF8;border:2px solid #D9D6CC;border-radius:28px;padding:36px 56px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:32px;line-height:1.45;color:#5B6660"><b style="color:#1B2620">Act as a subject coordinator.</b> Review… rate each fairly for merit… tell each what to improve… find training needs. Show your evidence.</p>
+</div>
+<div style="display:flex;flex-direction:column">
+<div style="display:flex;flex-direction:row;gap:32px;align-items:center;border-top:2px solid #D9D6CC;padding:16px 0px">
+<svg class="icon" style="color:#1F7A4A;width:56px;height:56px;flex:none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="M22 4 12 14.01l-3-3"/></svg>
+<p style="font-size:38px;color:#3F4A44;flex:1"><b style="color:#0E3326">Review everything</b> — 82 indicators across CM, LG, COT</p>
+</div>
+<div style="display:flex;flex-direction:row;gap:32px;align-items:center;border-top:2px solid #D9D6CC;padding:16px 0px">
+<svg class="icon" style="color:#1F7A4A;width:56px;height:56px;flex:none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="M22 4 12 14.01l-3-3"/></svg>
+<p style="font-size:38px;color:#3F4A44;flex:1"><b style="color:#0E3326">Rate fairly</b> — trimester averages feed 25% of merit weights</p>
+</div>
+<div style="display:flex;flex-direction:row;gap:32px;align-items:center;border-top:2px solid #D9D6CC;padding:16px 0px">
+<svg class="icon" style="color:#1F7A4A;width:56px;height:56px;flex:none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="M22 4 12 14.01l-3-3"/></svg>
+<p style="font-size:38px;color:#3F4A44;flex:1"><b style="color:#0E3326">Say what to improve</b> — indicator-level PDF, auto-emailed</p>
+</div>
+<div style="display:flex;flex-direction:row;gap:32px;align-items:center;border-top:2px solid #D9D6CC;border-bottom:2px solid #D9D6CC;padding:16px 0px">
+<svg class="icon" style="color:#1F7A4A;width:56px;height:56px;flex:none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="M22 4 12 14.01l-3-3"/></svg>
+<p style="font-size:38px;color:#3F4A44;flex:1"><b style="color:#0E3326">Find training needs</b> — radar dips by subject and department</p>
+</div>
+</div>
+<p style="font-family:'Source Serif 4', Georgia, serif;font-size:52px;font-weight:600;line-height:1.15;color:#0E3326">The coordinator still decides. Now the evidence comes with the decision.</p>
+<aside>(~50 sec) Bring back the opening prompt.
+
+“Remember this? Let’s check the reply line by line.”
+- Review everything — 82 indicators across planning, design and implementation.
+- Rate fairly — three-trimester averages feed CM 5%, LG 5%, COT 15% of the merit rating.
+- Tell each teacher what to improve — an indicator-level PDF report in their inbox as soon as the evaluation is finalized.
+- Find training needs — the radar dips, by subject and by department.
+
+Land the conclusion: “This isn’t AI replacing the coordinator. The coordinator still makes the judgment. What changed is that the evidence now comes with the decision — transparent, consistent, and reflective.”</aside>
+</section>
+
+<section id="limits" data-transition="fade" style="background:#F5F3EC;color:#1B2620;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px;display:flex;flex-direction:column;gap:40px">
+<p style="font-size:32px;color:#1F7A4A;font-weight:600;text-transform:uppercase;letter-spacing:3px">Limitations and recommendations</p>
+<h2 style="font-family:'Source Serif 4', Georgia, serif;font-size:88px;font-weight:600;line-height:1.05;color:#0E3326">Honest limits, clear next steps</h2>
+<div style="flex:1;display:flex;flex-direction:row;gap:40px">
+<div style="flex:1;display:flex;flex-direction:column;gap:20px;background:#FDFCF8;border:1px solid #D9D6CC;border-radius:24px;padding:40px">
+<h3 style="font-size:44px;font-weight:600;color:#0E3326">Limitations</h3>
+<ul style="font-size:40px;line-height:1.3;color:#3F4A44;display:flex;flex-direction:column;gap:24px">
+<li>No causal claim on teacher or student gains</li>
+<li>Teacher-made assessments not analyzed</li>
+<li>Indicators specific to LSGH</li>
+<li>Only as good as the evaluator’s input</li>
+<li>Google Sheets limits scale and security</li>
+</ul>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:20px;background:#0E3326;border-radius:24px;padding:40px">
+<h3 style="font-size:44px;font-weight:600;color:#E3B23C">Recommendations</h3>
+<ul style="font-size:40px;line-height:1.3;color:#F5F3EC;display:flex;flex-direction:column;gap:24px">
+<li>Keep calibrating the scoring model</li>
+<li>Tighten access control and user roles</li>
+<li>Standardize teacher identity records</li>
+<li>Add a report preview before sending</li>
+<li>Review indicators periodically</li>
+</ul>
+</div>
+</div>
+<aside>(~45 sec) Being honest about the limits:
+- This is a design-and-development study, so I can’t claim the system caused teacher improvement or learning gains.
+- It covers CM, LG and classroom implementation — not teacher-made assessments.
+- The indicators are LSGH-specific; another school would need to adapt them.
+- Output depends on the quality of what coordinators encode.
+- Google Sheets and Apps Script have limits on scale and security.
+
+Next steps: keep calibrating the scoring model; secure access so hidden sheets aren’t exposed; a standard teacher ID to avoid mismatched names; a preview before reports are sent; and periodic review of indicators against the Curriculum Framework and our Mission-Vision.</aside>
+</section>
+
+<section id="thanks" data-transition="fade" style="background:#0E3326;color:#F5F3EC;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;justify-content:center;gap:48px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:44px;color:#E3B23C">&gt; Act as the audience. Ask the researcher anything.</p>
+<h1 style="font-family:'Source Serif 4', Georgia, serif;font-size:200px;font-weight:700;line-height:1;color:#F5F3EC">Thank you</h1>
+<div style="width:200px;height:8px;background:#E3B23C"></div>
+<p style="font-size:40px;line-height:1.35;color:#C9D9CF"><b style="color:#F5F3EC">Reynel Mario Canor</b><br>Instructional Supervision System · La Salle Green Hills</p>
+<p style="position:absolute;left:128px;bottom:64px;width:1664px;font-size:28px;color:#C9D9CF">With thanks to Dr. Madiclum, Ms. Arkaina, Dr. Sentones, Ms. Ines and Dr. Rapatan</p>
+<aside>(~15 sec) Close the loop on the opening with one last prompt: “Act as the audience — ask me anything.”
+
+Thank the validators (Dr. Pamela Madiclum, Ms. Katherine Arkaina) and the academic leaders (Dr. Alce Sentones, Ms. Maria Donna Ines, Dr. Mike Rapatan), then open the floor.
+
+Running total: about 11 to 11½ minutes before Q&amp;A.</aside>
+</section>
+
+</div></div>
+<div id="notes" aria-live="polite"></div>
+<nav id="bar" aria-label="Slide controls">
+  <button id="prev" aria-label="Previous slide">‹ Prev</button>
+  <span id="count">1 / 1</span>
+  <button id="next" aria-label="Next slide">Next ›</button>
+  <button id="toggle-notes" aria-label="Toggle speaker notes">Notes (N)</button>
+  <button id="fs" aria-label="Toggle full screen">Full screen (F)</button>
+</nav>
+<script>
+(function () {
+  var stage = document.getElementById('stage');
+  var slides = Array.prototype.slice.call(stage.children);
+  var notes = document.getElementById('notes');
+  var i = 0;
+  function fit() {
+    var s = Math.min(window.innerWidth / 1920, window.innerHeight / 1080);
+    stage.style.transform = 'scale(' + s + ')';
+  }
+  function fromHash() {
+    var m = /slide-(\d+)/.exec(location.hash);
+    return m ? Math.min(Math.max(parseInt(m[1], 10) - 1, 0), slides.length - 1) : 0;
+  }
+  function show(n, push) {
+    i = Math.min(Math.max(n, 0), slides.length - 1);
+    slides.forEach(function (s, k) { s.classList.toggle('active', k === i); s.setAttribute('aria-hidden', k === i ? 'false' : 'true'); });
+    document.getElementById('count').textContent = (i + 1) + ' / ' + slides.length;
+    document.getElementById('progress').style.width = ((i + 1) / slides.length * 100) + '%';
+    var a = slides[i].querySelector('aside');
+    notes.textContent = a ? a.textContent : '';
+    if (push !== false) history.replaceState(null, '', '#slide-' + (i + 1));
+  }
+  document.getElementById('prev').onclick = function () { show(i - 1); };
+  document.getElementById('next').onclick = function () { show(i + 1); };
+  document.getElementById('toggle-notes').onclick = function () { notes.classList.toggle('show'); };
+  function toggleFs() {
+    if (!document.fullscreenElement) { document.documentElement.requestFullscreen && document.documentElement.requestFullscreen(); }
+    else { document.exitFullscreen && document.exitFullscreen(); }
+  }
+  document.getElementById('fs').onclick = toggleFs;
+  document.addEventListener('keydown', function (e) {
+    var k = e.key;
+    if (k === 'ArrowRight' || k === 'PageDown' || k === ' ' || k === 'Enter') { e.preventDefault(); show(i + 1); }
+    else if (k === 'ArrowLeft' || k === 'PageUp' || k === 'Backspace') { e.preventDefault(); show(i - 1); }
+    else if (k === 'Home') show(0);
+    else if (k === 'End') show(slides.length - 1);
+    else if (k === 'n' || k === 'N') notes.classList.toggle('show');
+    else if (k === 'f' || k === 'F') toggleFs();
+  });
+  document.getElementById('viewport').addEventListener('click', function (e) {
+    if (e.target.closest('a')) return;
+    show(e.clientX < window.innerWidth / 3 ? i - 1 : i + 1);
+  });
+  var tx = null;
+  document.addEventListener('touchstart', function (e) { tx = e.touches[0].clientX; }, { passive: true });
+  document.addEventListener('touchend', function (e) {
+    if (tx === null) return;
+    var dx = e.changedTouches[0].clientX - tx;
+    if (Math.abs(dx) > 40) show(dx < 0 ? i + 1 : i - 1);
+    tx = null;
+  });
+  window.addEventListener('resize', fit);
+  window.addEventListener('hashchange', function () { show(fromHash(), false); });
+  fit();
+  show(fromHash(), false);
+})();
+</script>
+</body>
+</html>
