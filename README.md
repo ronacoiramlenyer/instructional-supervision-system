@@ -11,3 +11,14 @@ node scripts/build-site.js deck site/index.html
 ```
 
 Controls: ← / → or click to change slides, **N** for speaker notes, **F** for full screen. Link to a slide with `#slide-7`.
+
+## Deploying
+
+The site is deployed to Cloudflare Pages as a single advanced-mode worker that embeds `site/` (no separate asset upload):
+
+```bash
+node scripts/build-site.js deck site/index.html
+node scripts/build-worker.js site dist/_worker.js
+```
+
+Then upload `dist/_worker.js` as a Pages direct-upload deployment (multipart form: `branch=main`, `manifest={}`, `_worker.js=@dist/_worker.js`).
