@@ -29,6 +29,7 @@ function slide(id) {
   });
   h = h.replace(/<x-shape kind="arrow-right" style="background:([^;]+);width:(\d+)px;height:(\d+)px"><\/x-shape>/g,
     (m, color, w, ht) => `<svg width="${w}" height="${ht}" viewBox="0 0 10 5" preserveAspectRatio="none" aria-hidden="true"><path d="M0 1.5h6V0l4 2.5L6 5V3.5H0z" fill="${color}"/></svg>`);
+  h = h.split('<a href="https').join('<a target="_blank" rel="noopener" href="https');
   if (/<x-/.test(h)) throw new Error('unconverted custom element in ' + id);
   return h;
 }

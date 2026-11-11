@@ -4,14 +4,15 @@
   "lists": "css",
   "title": "Instructional Supervision System",
   "cover": "prompt",
-  "order": ["prompt", "reality", "title", "stakes", "questions", "rq1", "alignment", "ipo", "cycles", "cm-dash", "cot-dash", "merit", "survey", "voices", "reprompt", "limits", "thanks"],
+  "order": ["prompt", "reality", "title", "stakes", "questions", "rq1", "alignment", "ipo", "cycles", "cm-dash", "cot-dash", "merit", "survey", "voices", "reprompt", "limits", "thanks", "next"],
   "sections": {
     "s1": {"description": "The hook: an AI-style prompt that is really a coordinator’s job description", "start": "prompt"},
     "s2": {"description": "Why supervision needed a system, and the questions the study asked", "start": "title"},
     "s3": {"description": "Results for RQ1 and RQ2: the challenges found, and the design that answers them", "start": "rq1"},
     "s4": {"description": "Results for RQ3: dashboards, reports and merit rating", "start": "cm-dash"},
     "s5": {"description": "Results for RQ4: coordinators’ ratings and words", "start": "survey"},
-    "s6": {"description": "Closing the loop on the prompt, limits, next steps", "start": "reprompt"}
+    "s6": {"description": "Closing the loop on the prompt, limits, next steps", "start": "reprompt"},
+    "s7": {"description": "Backup: the next step, Learning Outcomes Analytics, to complete the cycle", "start": "next"}
   },
   "faces": {
     "source-serif-4": {"family": "Source Serif 4", "href": "https://fonts.googleapis.com/css2?family=Source+Serif+4:wght@400;600;700&family=IBM+Plex+Sans:wght@400;600&family=JetBrains+Mono:wght@400;600&display=swap"},
