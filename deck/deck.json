@@ -4,14 +4,13 @@
   "lists": "css",
   "title": "Instructional Supervision System",
   "cover": "cover",
-  "order": ["cover", "prompt", "reality", "stakes", "questions", "rq1", "alignment", "ipo", "cycles", "cm-dash", "cot-dash", "merit", "survey", "voices", "reprompt", "limits", "thanks", "next"],
+  "order": ["cover", "prompt", "part-problem", "reality", "stakes", "questions", "part-solution", "alignment", "ipo", "cycles", "cm-dash", "cot-dash", "merit", "part-results", "rq1", "survey", "voices", "reprompt", "limits", "thanks", "next"],
   "sections": {
     "s1": {"description": "Cover, then the hook: an AI-style prompt that is really a coordinator’s job description", "start": "cover"},
-    "s2": {"description": "Why supervision needed a system, and the questions the study asked", "start": "stakes"},
-    "s3": {"description": "Results for RQ1 and RQ2: the challenges found, and the design that answers them", "start": "rq1"},
-    "s4": {"description": "Results for RQ3: dashboards, reports and merit rating", "start": "cm-dash"},
-    "s5": {"description": "Results for RQ4: coordinators’ ratings and words", "start": "survey"},
-    "s6": {"description": "Closing the loop on the prompt, limits, next steps", "start": "reprompt"},
+    "s2": {"description": "Problem: fragmented, manual supervision data, why it matters, and the research questions", "start": "part-problem"},
+    "s3": {"description": "Solution: the Instructional Supervision System, its design (RQ2) and its outputs (RQ3)", "start": "part-solution"},
+    "s4": {"description": "Results: challenges answered (RQ1), coordinators’ ratings and words (RQ4), back to the prompt", "start": "part-results"},
+    "s6": {"description": "Closing: limits, next steps, thanks", "start": "limits"},
     "s7": {"description": "Backup: the next step, Learning Outcomes Analytics, to complete the cycle", "start": "next"}
   },
   "faces": {
