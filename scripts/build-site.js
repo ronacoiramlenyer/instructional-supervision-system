@@ -1,15 +1,22 @@
-// Builds a standalone presentation (site/index.html) from the deck's slide files.
+// Builds a standalone presentation page from a deck's slide files.
+// Usage: node scripts/build-site.js <deck dir> <out html>
 const fs = require('fs');
 const path = require('path');
 const [deckDir, outFile] = process.argv.slice(2);
 const deck = JSON.parse(fs.readFileSync(path.join(deckDir, 'deck.json'), 'utf8'));
 
 const blobs = {
-  '/_blob/0b44b39f78765e83e4cd0dd264758a7d': 'images/cm-encoder-sidebar.png',
-  '/_blob/2e1edaa2fc8c29eb9a1e360c46a3a9e2': 'images/cm-dashboard.png',
-  '/_blob/5bfdfae14697e9c312672a4ebf222342': 'images/cot-dashboard.png',
-  '/_blob/54ee57b76d9e17905771f9f962d0e826': 'images/merit-matrix.png',
-  '/_blob/cc24f66fc9a11c34c8519213675a0c82': 'images/supervision-dashboard.png',
+  // Version 1 deck assets
+  '/_blob/0b44b39f78765e83e4cd0dd264758a7d': '/images/cm-encoder-sidebar.png',
+  '/_blob/2e1edaa2fc8c29eb9a1e360c46a3a9e2': '/images/cm-dashboard.png',
+  '/_blob/5bfdfae14697e9c312672a4ebf222342': '/images/cot-dashboard.png',
+  '/_blob/54ee57b76d9e17905771f9f962d0e826': '/images/merit-matrix.png',
+  '/_blob/cc24f66fc9a11c34c8519213675a0c82': '/images/supervision-dashboard.png',
+  // Version 2 deck assets (same images, copied under new ids)
+  '/_blob/433007d7761bd426a1618ef8ee55df46': '/images/cm-encoder-sidebar.png',
+  '/_blob/5c341ed81ed7600b0a77fe9617791dd1': '/images/cm-dashboard.png',
+  '/_blob/9fcffc69d30635dbd59e7ea3b15660eb': '/images/cot-dashboard.png',
+  '/_blob/c33cd4b7abe37077e6860a310a7256a9': '/images/merit-matrix.png',
 };
 
 const icons = {
@@ -18,6 +25,8 @@ const icons = {
   Search: '<circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>',
   Warning: '<path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><path d="M12 9v4"/><path d="M12 17h.01"/>',
   CheckCircle: '<path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="M22 4 12 14.01l-3-3"/>',
+  Lightbulb: '<path d="M9 18h6"/><path d="M10 22h4"/><path d="M12 2a7 7 0 0 0-4 12.7c.6.5 1 1.3 1 2.1V17h6v-.2c0-.8.4-1.6 1-2.1A7 7 0 0 0 12 2z"/>',
+  Users: '<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>',
 };
 
 function slide(id) {
@@ -34,7 +43,8 @@ function slide(id) {
   return h;
 }
 
-const fontHref = deck.faces['source-serif-4'].href;
+const fontLinks = [...new Set(Object.values(deck.faces).map(f => f.href).filter(Boolean))]
+  .map(h => `<link rel="stylesheet" href="${h}">`).join('\n');
 const slides = deck.order.map(slide).join('\n');
 
 const html = `<!doctype html>
@@ -46,7 +56,7 @@ const html = `<!doctype html>
 <meta name="description" content="Instructional Supervision System: a data-driven automated system for monitoring and evaluation of teachers’ performance. Research presentation, La Salle Green Hills.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="${fontHref}">
+${fontLinks}
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; }
   html, body { height: 100%; background: #0B2A1F; overflow: hidden; }
@@ -68,6 +78,7 @@ const html = `<!doctype html>
   body:hover #bar, #bar:focus-within { opacity: 1; }
   #bar button { background: rgba(245,243,236,.12); color: #F5F3EC; border: 1px solid rgba(245,243,236,.25); border-radius: 8px;
     padding: 6px 14px; font: inherit; cursor: pointer; }
+  #bar a#home { color: #F5F3EC; text-decoration: none; background: rgba(245,243,236,.12); border: 1px solid rgba(245,243,236,.25); border-radius: 8px; padding: 6px 14px; }
   #bar button:hover { background: rgba(245,243,236,.22); }
   #notes { position: fixed; right: 16px; top: 16px; width: min(420px, calc(100vw - 32px)); max-height: 60vh; overflow: auto;
     background: rgba(14,51,38,.95); color: #F5F3EC; border: 1px solid #2E5A47; border-radius: 12px; padding: 16px 18px;
@@ -83,6 +94,7 @@ ${slides}
 </div></div>
 <div id="notes" aria-live="polite"></div>
 <nav id="bar" aria-label="Slide controls">
+  <a href="/" id="home" aria-label="Back to all versions">⌂ Versions</a>
   <button id="prev" aria-label="Previous slide">‹ Prev</button>
   <span id="count">1 / 1</span>
   <button id="next" aria-label="Next slide">Next ›</button>

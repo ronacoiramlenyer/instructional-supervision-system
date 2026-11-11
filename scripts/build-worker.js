@@ -21,7 +21,9 @@ function bytes(p) {
 }
 export default {
   async fetch(request) {
-    let p = new URL(request.url).pathname;
+    const url = new URL(request.url);
+    let p = url.pathname;
+    if (!p.endsWith('/') && FILES[p + '/index.html']) { url.pathname = p + '/'; return Response.redirect(url.toString(), 301); }
     if (p.endsWith('/')) p += 'index.html';
     const f = FILES[p];
     if (!f) return new Response('Not found', { status: 404, headers: { 'content-type': 'text/plain' } });
